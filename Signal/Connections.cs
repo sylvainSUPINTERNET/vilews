@@ -16,7 +16,7 @@ namespace HubConnections
         }
 
         // Looking for connectionId ( not himself )
-        public string findSomeone( string connectionId ) {
+        public string FindSomeoneWhoIsNot( string connectionId ) {
             Dictionary<string, string> dict = this.currentConnected.Where( el => el.Key != connectionId).ToDictionary(el => el.Key, el => el.Value);
             if ( dict.Count == 0 ) {
                 return "";
