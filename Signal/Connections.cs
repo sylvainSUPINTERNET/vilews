@@ -1,27 +1,35 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace HubConnections 
 {
-    public class Connections 
+    public class Connections : IConnections
     {
-        public Dictionary<string, string> currentConnected { get; }
+        public IConnectionsTrackingSingleton ic;
 
+        public Connections(IConnectionsTrackingSingleton connectionsTrackingSingleton) {
+            ic = connectionsTrackingSingleton;
+        }
+
+        public int GetCurrentConnectedCount () {
+            return ic.GetConnections().Count;
+        }
         public void AddConnection( string connectionId, string nickname) {
-            this.currentConnected.Add(connectionId, nickname); // avoid collision
+            ic.GetConnections().Add(connectionId, nickname); // avoid collision
         }
 
         public void RemoveConnection(string connectionId) {
-            this.currentConnected.Remove(connectionId);
+            ic.GetConnections().Remove(connectionId);
         }
 
         // Looking for connectionId ( not himself )
         public string FindSomeoneWhoIsNot( string connectionId ) {
-            Dictionary<string, string> dict = this.currentConnected.Where( el => el.Key != connectionId).ToDictionary(el => el.Key, el => el.Value);
+            Dictionary<string, string> dict = ic.GetConnections().Where( el => el.Key != connectionId).ToDictionary(el => el.Key, el => el.Value);
             if ( dict.Count == 0 ) {
                 return "";
             } else {
-                return dict.First().Key;
+                return dict.ElementAt(new Random().Next(0, dict.Count - 1)).Value;
             }
         }   
     }
