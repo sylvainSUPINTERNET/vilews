@@ -23,20 +23,17 @@ namespace SignalRChat.Hubs
         }
 
         public readonly string LAKE_ROOM_NAME = "lack";
-
-        /**
-        @Deprecated
-        */
-        public async Task SendMessage(string user, string message)
-        {
-            await Clients.Others.SendAsync("ReceiveMessage", user, message);
-        }
-
+        
         public async Task FindSomeone(string PeerOfferId) {
             if ( _connectionsLake.FindSomeoneWhoIsNot(Context.ConnectionId) != "") {
+                // Send to the target the peerId from the sender
                 string targetConnectionId = _connectionsLake.FindSomeoneWhoIsNot(Context.ConnectionId);
-                await Clients.Client(targetConnectionId).SendAsync(PeerOfferId);
+                await Clients.Client(targetConnectionId).SendAsync("newPeerOffer",PeerOfferId);
                 this._logger.LogInformation($" User : {Context.ConnectionId} send peer id to {targetConnectionId} ");
+
+                // Send back to the sender the peerId found
+                await Clients.Client(Context.ConnectionId).SendAsync("newPeerOfferSend", _connectionsLake.GetPeerIdForConnectionId(Context.ConnectionId));
+
             } else {
                 this._logger.LogInformation("Not enough user, nobody is connected, only you there !");
             }
@@ -53,17 +50,6 @@ namespace SignalRChat.Hubs
             
             // If user clicked on start and so present in JoinLake, means hes ready to talk else we don't care, even hes connected to the hub
             this._logger.LogInformation($"Current Total connected and ready to talk : {_connectionsLake.GetCurrentConnectedCount()}");
-
-            // Find someone peerId then return to the Context.ConnectionId
-            string targetPeerId = _connectionsLake.FindSomeoneWhoIsNot(Context.ConnectionId);
-            if (  targetPeerId != "") {
-                this._logger.LogInformation($"Peer id target found : {targetPeerId}" );
-                // TODO send peerIdTarget this information to the Context.ConnectionId 
-                // TODO send peerId current connection to the ConnectionId ( must be implemented in findSomeoneWhoIsnot);
-            } else {
-                this._logger.LogInformation("Not enough users connected, you are alone !");
-            }
-
         }
 
         public async Task LeaveLake() {

@@ -24,13 +24,20 @@ namespace HubConnections
         }
 
         // Looking for connectionId ( not himself )
+        // Key ( Context.ConnectionId)
+        // Value (peerId)
         public string FindSomeoneWhoIsNot( string connectionId ) {
             Dictionary<string, string> dict = ic.GetConnections().Where( el => el.Key != connectionId).ToDictionary(el => el.Key, el => el.Value);
             if ( dict.Count == 0 ) {
                 return "";
             } else {
-                return dict.ElementAt(new Random().Next(0, dict.Count - 1)).Value;
+                return dict.ElementAt(new Random().Next(0, dict.Count - 1)).Key;
             }
-        }   
+        }
+        
+        public string GetPeerIdForConnectionId ( string connectionId ) {
+            Dictionary<string, string> dict = ic.GetConnections().Where( el => el.Key == connectionId).ToDictionary(el => el.Key, el => el.Value);
+            return dict.First().Value;
+        }
     }
 }

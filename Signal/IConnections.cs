@@ -11,6 +11,8 @@ namespace HubConnections
         void RemoveConnection(string connectionId);
         string FindSomeoneWhoIsNot( string connectionId );
 
+        string GetPeerIdForConnectionId( string connectionId ) ;
+
         int GetCurrentConnectedCount();
 
 
